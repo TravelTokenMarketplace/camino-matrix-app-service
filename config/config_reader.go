@@ -6,13 +6,9 @@ package config
 import (
 	"errors"
 	"fmt"
-	"math/big"
 	"os"
 	"strings"
-	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
@@ -86,38 +82,14 @@ func (cr *reader) ReadConfig() (*Config, error) {
 }
 
 func (cr *reader) parseConfig(cfg *UnparsedConfig) (*Config, error) {
-	NetworkFeeRecipientBotECDSAKey, err := crypto.HexToECDSA(cfg.NetworkFeeRecipientBotKey)
-	if err != nil {
-		err = fmt.Errorf("invalid network fee recipient bot key: %w", err)
-		cr.logger.Error(err)
-		return nil, err
-	}
-
-	if !common.IsHexAddress(cfg.NetworkFeeRecipientCMAccountAddress) {
-		err := errors.New("invalid network fee recipient CM account address")
-		cr.logger.Error(err)
-		return nil, err
-	}
-
 	return &Config{
-		LogLevel:    cfg.LogLevel,
-		Matrix:      cfg.Matrix,
-		ChainRPCURL: cfg.ChainRPCURL,
+		LogLevel: cfg.LogLevel,
+		Matrix:   cfg.Matrix,
 		DB: SQLiteDBConfig{
 			Common: cfg.DB,
-			Scheduler: UnparsedSQLiteDBConfig{
-				DBPath: cfg.DB.DBPath + "/scheduler",
-			},
-			ChequeHandler: UnparsedSQLiteDBConfig{
-				DBPath: cfg.DB.DBPath + "/cheque_handler",
-			},
 			Service: UnparsedSQLiteDBConfig{
 				DBPath: cfg.DB.DBPath + "/service",
 			},
 		},
-		NetworkFeeRecipientCMAccountAddress: common.HexToAddress(cfg.NetworkFeeRecipientCMAccountAddress),
-		NetworkFeeRecipientBotKey:           NetworkFeeRecipientBotECDSAKey,
-		MinChequeDurationUntilExpiration:    big.NewInt(0).SetUint64(cfg.MinChequeDurationUntilExpiration),
-		CashInPeriod:                        time.Duration(cfg.CashInPeriod) * time.Second,
 	}, nil
 }

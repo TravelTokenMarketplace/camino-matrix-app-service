@@ -37,8 +37,7 @@ func TestReadConfig(t *testing.T) {
 			prepare: func(_ *testing.T, cr *reader) {
 				cr.viper.Set(flagKeyConfig, nonExistingConfigPath)
 			},
-			flags:       Flags(),
-			expectedErr: errInvalidRawConfig, // empty bot key
+			flags: Flags(),
 		},
 		"from file": {
 			prepare: func(_ *testing.T, cr *reader) {
@@ -74,7 +73,7 @@ func TestReadConfig(t *testing.T) {
 
 			require.NoError(t, unsetEnvFromMap(envPrefix, rawMap))
 
-			if err == nil {
+			if err == nil && name != "default" {
 				unparsedMap := &map[string]any{}
 				require.NoError(t, mapstructure.Decode(config.unparse(), unparsedMap))
 				configYAML, err := yaml.Marshal(unparsedMap)
