@@ -70,7 +70,7 @@ require (
 )
 
 replace (
-	github.com/chain4travel/camino-messenger-bot/v13 => ../camino-messenger-bot
+	github.com/chain4travel/camino-messenger-bot/v13 => github.com/TravelTokenMarketplace/camino-messenger-bot/v13 v13.0.0-20260610002735-5848e1e255c6
 	github.com/consensys/gnark-crypto => github.com/consensys/gnark-crypto v0.18.2
 	github.com/quic-go/quic-go => github.com/quic-go/quic-go v0.55.0
 )
