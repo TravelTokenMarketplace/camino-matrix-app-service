@@ -1,11 +1,10 @@
-// Copyright (C) 2022-2025, Chain4Travel AG. All rights reserved.
+// Copyright (C) 2022-2026, Chain4Travel AG. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package config
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"strings"
 
@@ -16,11 +15,7 @@ import (
 
 const envPrefix = "CMB"
 
-var (
-	_ Reader = (*reader)(nil)
-
-	errInvalidRawConfig = errors.New("invalid raw config")
-)
+var _ Reader = (*reader)(nil)
 
 type Reader interface {
 	ReadConfig() (*Config, error)
@@ -73,15 +68,12 @@ func (cr *reader) ReadConfig() (*Config, error) {
 		return nil, err
 	}
 
-	parsedCfg, err := cr.parseConfig(cfg)
-	if err != nil {
-		return nil, fmt.Errorf("%w: %w", errInvalidRawConfig, err)
-	}
+	parsedCfg := cr.parseConfig(cfg)
 
 	return parsedCfg, nil
 }
 
-func (cr *reader) parseConfig(cfg *UnparsedConfig) (*Config, error) {
+func (cr *reader) parseConfig(cfg *UnparsedConfig) *Config {
 	return &Config{
 		LogLevel: cfg.LogLevel,
 		Matrix:   cfg.Matrix,
@@ -91,5 +83,5 @@ func (cr *reader) parseConfig(cfg *UnparsedConfig) (*Config, error) {
 				DBPath: cfg.DB.DBPath + "/service",
 			},
 		},
-	}, nil
+	}
 }
