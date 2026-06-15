@@ -1,4 +1,4 @@
-// Copyright (C) 2022-2025, Chain4Travel AG. All rights reserved.
+// Copyright (C) 2022-2026, Chain4Travel AG. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package service
@@ -7,14 +7,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math/big"
 
-	"github.com/chain4travel/camino-matrix-app-service/config"
-	"github.com/chain4travel/camino-messenger-bot/v12/pkg/chequehandler"
-	cmaccounts "github.com/chain4travel/camino-messenger-bot/v12/pkg/cm_accounts"
-	"github.com/chain4travel/camino-messenger-bot/v12/pkg/matrix"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/chain4travel/camino-messenger-bot/v13/pkg/matrix"
 	"go.uber.org/zap"
 	"maunium.net/go/mautrix/event"
 	"maunium.net/go/mautrix/id"
@@ -32,32 +26,17 @@ type Service interface {
 
 func NewService(
 	logger *zap.SugaredLogger,
-	networkFeeRecipientCMAccountAddress common.Address,
 	storage Storage,
-	ethClient *ethclient.Client,
-	chainID *big.Int,
-	chequeHandler chequehandler.ChequeHandler,
-	cmAccounts cmaccounts.Service,
 ) Service {
 	return &service{
-		logger:                              logger,
-		ethClient:                           ethClient,
-		networkFeeRecipientCMAccountAddress: networkFeeRecipientCMAccountAddress,
-		storage:                             storage,
-		chainID:                             chainID,
-		cmAccounts:                          cmAccounts,
-		chequeHandler:                       chequeHandler,
+		logger:  logger,
+		storage: storage,
 	}
 }
 
 type service struct {
-	logger                              *zap.SugaredLogger
-	ethClient                           *ethclient.Client
-	storage                             Storage
-	networkFeeRecipientCMAccountAddress common.Address
-	chainID                             *big.Int
-	cmAccounts                          cmaccounts.Service
-	chequeHandler                       chequehandler.ChequeHandler
+	logger  *zap.SugaredLogger
+	storage Storage
 }
 
 func (s *service) ProcessEvents(ctx context.Context, events []event.Event) error {
@@ -119,16 +98,6 @@ func (s *service) processSignedMessageEvent(ctx context.Context, eventContent *m
 		return false, err
 	}
 	defer s.storage.Abort(session)
-
-	if err := s.chequeHandler.VerifyAndStoreCheque(
-		ctx,
-		&eventContent.NetworkFeeCheque,
-		matrix.AddressFromUserID(senderBotUserID),
-		config.NetworkFee,
-	); err != nil {
-		s.logger.Infof("Event %s, message %s: failed to verify cheque: %v", eventID, eventContent.MessageID, err)
-		return true, nil
-	}
 
 	storedChunksCount, _, err := s.storage.GetChunksCount(ctx, session, eventContent.MessageID)
 	if err != nil && !errors.Is(err, ErrNotFound) {

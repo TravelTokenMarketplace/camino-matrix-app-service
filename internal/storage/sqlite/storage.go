@@ -1,4 +1,4 @@
-// Copyright (C) 2022-2025, Chain4Travel AG. All rights reserved.
+// Copyright (C) 2022-2026, Chain4Travel AG. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package sqlite
@@ -10,7 +10,7 @@ import (
 	"errors"
 
 	"github.com/chain4travel/camino-matrix-app-service/internal/service"
-	"github.com/chain4travel/camino-messenger-bot/v12/pkg/database/sqlite"
+	"github.com/chain4travel/camino-messenger-bot/v13/pkg/database/sqlite"
 	_ "github.com/golang-migrate/migrate/v4/source/file" // required by migrate
 	_ "github.com/mattn/go-sqlite3"                      // sql driver, required
 	"go.uber.org/zap"

@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  go_version: "~1.24.9"
+  go_version: "1.25.10"
 
 permissions:
   # Required: allow read access to the content for analysis.
@@ -54,7 +54,7 @@ jobs:
       - name: Run shellcheck
         shell: bash
         run: scripts/shellcheck.sh
-        
+
   check_clean_branch:
     name: Check that go mod tidy is performed
     runs-on: ubuntu-latest
@@ -79,7 +79,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          
+
       - name: Build and push Docker images
         uses: docker/build-push-action@v5
         with:
