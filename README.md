@@ -19,9 +19,8 @@ The **Camino Matrix App Service** is an extension component of the Camino Messen
            │    Camino Matrix App Service     │
            │                                  │
            │  1. Verifies signed message sigs │
-           │  2. Validates off-chain cheques   │
-           │  3. Tracks message chunks        │
-           │  4. Enforces bot compliance     │
+           │  2. Tracks message chunks        │
+           │  3. Enforces bot compliance      │
            └──────────────────┬───────────────┘
                               │
                       If check fails
@@ -38,10 +37,7 @@ The **Camino Matrix App Service** is an extension component of the Camino Messen
    - It captures `matrix.EventTypeSignedMessage` and `matrix.EventTypeMessageChunk` events from all rooms.
 2. **Signature Verification**:
    - For every transaction message, the App Service calls `eventContent.Verify()` to validate the sender's signature.
-3. **Cheque Validation**:
-   - Every transaction payload carries an off-chain cumulative cheque for the Network Fee.
-   - The App Service validates these cheques using its internal `chequeHandler.VerifyAndStoreCheque`. If a cheque is invalid, expired, or carries an incorrect amount, the bot sender is flagged.
-4. **Chunk Tracking**:
+3. **Chunk Tracking**:
    - Large payloads (such as extensive search results) are split and sent in chunks (`MessageChunk`). The App Service tracks chunk counts to prevent spam or misreporting.
 
 ---
@@ -49,14 +45,14 @@ The **Camino Matrix App Service** is an extension component of the Camino Messen
 ## Current Enforcement Status
 
 > [!NOTE]
-> **Not Enforced Yet**: While the App Service processes and flags invalid cheques/signatures for user banning, the actual banning execution is currently a no-op stub:
+> **Not Enforced Yet**: While the App Service processes and flags invalid signatures for user banning, the actual banning execution is currently a no-op stub:
 > ```go
 > // TODO @evlekht implement (next ticket) // persist with db, make it durable? not just call it from event receiver?
 > func (s *service) banUser(_ context.Context, _ id.UserID) error {
 >     return nil
 > }
 > ```
-> Bots sending invalid cheques or missing signatures will generate warnings in the logs, but are not actively muted or blocked on the network at this stage.
+> Bots sending invalid or missing signatures will generate warnings in the logs, but are not actively muted or blocked on the network at this stage.
 
 ---
 
